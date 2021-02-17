@@ -2,6 +2,7 @@ package com.example.demo;
 
 import com.example.demo.entity.Employee;
 import com.example.demo.repository.DriverDao;
+import com.example.demo.repository.DriverDaoImpl;
 import com.google.gson.Gson;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class DemoApplication {
         System.out.println(record.key());
         System.out.println(record.value());
         Employee employee = record.value();
-        dao.save(employee);
+        dao.saveDriver(employee);
 
         System.out.println(employee);
     }
