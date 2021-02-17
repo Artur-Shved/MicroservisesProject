@@ -2,26 +2,27 @@ package com.example.demo.repository;
 
 import com.example.demo.entity.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 
 @Repository
 public class DriverDao {
     private static final String HASH_KEY = "Consumer";
 
     @Autowired
-    private RedisTemplate<String, Object> template;
+    private RedisTemplate<String, Employee> template;
 
-    public List<Object> findAll(){
-        return template.opsForHash().values(HASH_KEY);
-    }
-
-//    public Product save(Product product){
-//        template.opsForHash().put(HASH_KEY, product.getResource(), product);
-//        return product;
+//    @Autowired
+//    public DriverDao(@Qualifier("redisTemplate")RedisTemplate<String, Employee> template){
+//        this.template = template;
 //    }
+
+    public Set<Employee> findAll(String resource){
+        return template.opsForZSet().range(resource,0,template.opsForZSet().size(resource));
+    }
 
     public Employee save(Employee employee){
 //        String month = product.getTime().getMonth().toString();
@@ -55,5 +56,17 @@ public class DriverDao {
         Double score = Double.parseDouble(result);
         template.opsForZSet().add(employee.getResource(), employee, score);
         return employee;
+    }
+
+    public Employee lastPointOfDriver(String resource){
+        Set<Employee> product = template.opsForZSet().range(resource, (template.opsForZSet().size(resource)-1),
+                template.opsForZSet().size(resource));
+
+        Employee latPointOfProduct = null;
+        for(Employee product1 : product){
+            latPointOfProduct = product1;
+        }
+
+        return  latPointOfProduct;
     }
 }

@@ -17,17 +17,6 @@ public class DemoApplication {
     @Autowired
     DriverDao dao;
 
-//    @Bean
-//    JedisConnectionFactory jedisConnectionFactory (){
-//        return new JedisConnectionFactory();
-//    }
-//
-//    @Bean
-//    RedisTemplate<String, Product> redisTemplate(){
-//        RedisTemplate<String, Product> redisTemplate = new RedisTemplate<>();
-//        redisTemplate.setConnectionFactory(jedisConnectionFactory());
-//        return redisTemplate;
-//    }
 
     @KafkaListener(topics = "msg")
     public void orderListener(ConsumerRecord<String, Employee> record){
