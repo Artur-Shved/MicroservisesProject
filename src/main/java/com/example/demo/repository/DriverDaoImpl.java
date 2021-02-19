@@ -1,6 +1,8 @@
 package com.example.demo.repository;
 
 import com.example.demo.entity.Employee;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,7 +11,8 @@ import java.util.Set;
 
 @Repository
 public class DriverDaoImpl implements DriverDao {
-    private static final String HASH_KEY = "Consumer";
+
+    Logger logger = LoggerFactory.getLogger(DriverDaoImpl.class);
 
     @Autowired
     private RedisTemplate<String, Employee> template;
@@ -24,21 +27,6 @@ public class DriverDaoImpl implements DriverDao {
     }
 
     public Employee saveDriver(Employee employee){
-//        String month = product.getTime().getMonth().toString();
-//        String year =String.valueOf(product.getTime().getYear());
-//        String dayOfMonth = String.valueOf(product.getTime().getDayOfMonth());
-//        String hour  = String.valueOf(product.getTime().getHour());
-//        String minutes = String.valueOf(product.getTime().getMinute());
-//        String second = String.valueOf(product.getTime().getSecond());
-//        String result = month+year+dayOfMonth+hour+minutes+second;
-//        StringBuilder time = new StringBuilder();
-//        time.append(product.getTime().getYear());
-//        time.append(product.getTime().getMonth());
-//        time.append(product.getTime().getDayOfMonth());
-//        time.append(product.getTime().getHour());
-//        time.append(product.getTime().getMinute());
-//        time.append(product.getTime().getSecond());
-
         String date = employee.getTime().toString();
         String[] splitDate = date.split("T");
         String[] splitDateOne = splitDate[0].split("-");
@@ -51,9 +39,8 @@ public class DriverDaoImpl implements DriverDao {
         for(String s : splitDateTwo){
             result+=s;
         }
-
-        Double score = Double.parseDouble(result);
-        template.opsForZSet().add(employee.getResource(), employee, score);
+        template.opsForZSet().add(employee.getResource(), employee, Double.parseDouble(result));
+        logger.info("User is save: " + employee);
         return employee;
     }
 
@@ -61,11 +48,8 @@ public class DriverDaoImpl implements DriverDao {
         Set<Employee> product = template.opsForZSet().range(resource, (template.opsForZSet().size(resource)-1),
                 template.opsForZSet().size(resource));
 
-        Employee latPointOfProduct = null;
-        for(Employee product1 : product){
-            latPointOfProduct = product1;
-        }
-
+        Employee latPointOfProduct = product.iterator().next();
+        logger.info("last position of driver: " + latPointOfProduct);
         return  latPointOfProduct;
     }
 }
